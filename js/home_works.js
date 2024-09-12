@@ -14,18 +14,70 @@
     }
  }
 
+
+ //moveBlock
+
  const childBlock = document.querySelector(".child_block")
- let position = 0
- const width = 449
+ let positionX = 0, positionY = 0
 
 const block = () => {
-    if (position < width){
-        position++
-        childBlock.style.left = `${position}px`
-        // requestAnimationFrame(block)
-        
-    }
-    setTimeout(block, 1)
+   if(positionX <= 450 && positionY === 0){
+       positionX +=10
+       childBlock.style.left = positionX + 'px'
+       childBlock.style.rotate = '90deg'
+       setTimeout(block, 0)
+   }else if(positionY <= 450 && positionX > 440){
+       positionY+=10
+       childBlock.style.top = positionY + 'px'
+       childBlock.style.rotate = '180deg'
+       setTimeout(block, 0)
+
+   }else if( positionX >= 0){
+       positionX -=10
+       childBlock.style.left = positionX + 'px'
+       setTimeout(block, 0)
+       childBlock.style.rotate = '270deg'
+
+   }else if(positionY >= 0){
+       positionY -=10
+       childBlock.style.top = positionY + 'px'
+       setTimeout(block, 0)
+       childBlock.style.rotate = '3600deg'
+
+   }
 }
 block()
+
+
+ //timer
+const start = document.querySelector("#start")
+const stop = document.querySelector("#stop")
+const reset = document.querySelector("#reset")
+ const seconds = document.querySelector("#seconds")
+ let counter = 0
+ seconds.innerHTML = `<span>${counter}</span>`
+ let switcher = true
+ start.onclick = () => {
+
+    if (switcher === true){
+        const timerId = setInterval(() => {
+            if (counter < 999){
+                counter+=1
+                seconds.innerHTML = `<span>${counter}</span>`
+            }
+        },1000)
+        stop.onclick = () => {
+            clearInterval(timerId)
+            switcher =true
+        }
+        reset.onclick =() => {
+            counter =0
+            seconds.innerHTML = `<span>${counter}</span>`
+            switcher =true
+
+        }
+        switcher =false
+    }
+
+ }
 
