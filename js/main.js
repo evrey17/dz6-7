@@ -75,3 +75,12 @@ prev.onclick = () => {
 }
 
 autoSlider(index)
+
+
+const obj = {
+    name: 'Aziz',
+    age:38,
+}
+
+const jsonObj = JSON.stringify(obj)
+console.log (jsonObj)

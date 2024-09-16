@@ -31,10 +31,4 @@ window.onscroll = () => {
     window.removeEventListener('scroll', openModal)
 }
 
-
-
-
-
-
-
 setTimeout(() => openModal(), 10000)
