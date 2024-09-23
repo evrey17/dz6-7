@@ -83,3 +83,51 @@ converter(eurInput, somInput , usdInput)
 console.log('Loading...')
 
 
+//card switcher
+
+let count = 1
+const btnPrev = document.querySelector('#btn-prev')
+const btnNext = document.querySelector('#btn-next')
+const card = document.querySelector('.card')
+
+const getAsyncData = async () => {
+    try{
+        const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${count}`)
+        const data = await response.json()
+        card.innerHTML = `
+            <span>${data.id}</span>
+            <span>${data.title}</span>
+
+        `
+    }catch(e){
+        console.log(e)
+    }
+    
+   
+}
+btnNext.onclick = () => {
+    if(count++ && count >= 201)
+    count =1
+    getAsyncData()
+}
+btnPrev.onclick = () => {
+    if(count-- && count <=1){
+        count= 200
+    }
+    getAsyncData()
+}
+getAsyncData()
+
+const getAsyncDataPosts = async () => {
+    try{
+        const response = await fetch('https://jsonplaceholder.typicode.com/posts/')
+        const data = await response.json()
+        console.log(data,'posts')
+
+    }catch(e){
+        console.log(e)
+    }
+}
+getAsyncDataPosts()
+
+
