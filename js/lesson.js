@@ -1,7 +1,27 @@
+// phone checker
 
+const phoneInput = document.querySelector('#phone_input')
+const phoneCheckt = document.querySelector('#phone_button')
+const phoneResult = document.querySelector('#phone_result')
+
+const regExp = /\+996 \d{3} \d{2}-\d{2}-\d{2}$/
+
+phoneCheckt.onclick = () =>{
+    if (regExp.test(phoneInput.value)){
+        phoneResult.innerHTML = 'ok'
+        phoneResult.style.color = 'green'
+    }else{
+        phoneResult.innerHTML = 'NOT OK'
+        phoneResult.style.color= 'red'
+    }
+}
+
+//TAB SLIDER
 const tabContent = document.querySelectorAll('.tab_content_block')
 const tabs =document.querySelectorAll('.tab_content_item')
 const tabsParent =document.querySelector('.tab_content_items')
+
+
 const hideTabContent = () => {
     tabContent.forEach( (item) => {
         item.style.display = 'none'
@@ -10,12 +30,17 @@ const hideTabContent = () => {
         item.classList.remove('tab_content_item_active')
     })
 }
+
+
 const showTabContent = (index = 0) => {
     tabContent[index].style.display = 'block'
     tabs[index].classList.add('tab_content_item_active')
 }
+
+
 hideTabContent()
 showTabContent()
+
 
 tabsParent.onclick = (event) => {
     const target = event.target
@@ -41,93 +66,113 @@ const slideTime = () =>{
 
 setInterval(slideTime , 3000)
 
-// Converter 
-const somInput = document.querySelector('#som')
-const usdInput = document.querySelector('#usd')
-const eurInput = document.querySelector("#eur")
-const converter = (element, element2 , element3) => {
-    element.oninput = () => {
-        const request = new XMLHttpRequest();
-        request.open('GET', '../data/converter.json');
-        request.setRequestHeader('Content-type', 'application/json');
-        request.send();
 
-        request.onload = ()=> {
-            const data = JSON.parse(request.response);
-            if(element === " "){
-                element2.value = ' '
-                element3.value = ' '
-            }
-            if (element === som){
-                element2.value = (element.value / data.usd).toFixed(2);
-                element3.value = (element.value / data.eur).toFixed(2)
-            }
-            if (element === usd){
-                element2.value = (element.value * data.usd).toFixed(2);
-                element3.value = (element.value*data.usd/data.eur).toFixed(2)
-            }
-            if (element === eur){
-                element2.value = (element.value / data.eur).toFixed(2)
-                element3.value = (element.value*data.eur/data.usd).toFixed(2)
-            }
+//kiss - keep it short and simple
 
-        }
+const som = document.querySelector('#som');
+const usd = document.querySelector('#usd');
+const eur = document.querySelector('#eur');
+
+const fetchData = async () => {
+    try {
+        const response = await fetch("../data/converter.json");
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        throw error;
     }
-}
+};
 
-converter(somInput, usdInput , eurInput)
-converter(usdInput, somInput , eurInput)
-converter(eurInput, somInput , usdInput)
+const convert = async (elem, target, target2) => {
+    elem.oninput = async () => {
+        try {
+            const response = await fetchData();
+
+            target.forEach(e => {
+                if (target2 === 'som') {
+                    e.value = (elem.value / response[e.id]).toFixed(2);
+                } else if (e === som) {
+                    e.value = (elem.value * response[elem.id]).toFixed(2);
+                } else {
+                    e.value = ((elem.value * response[elem.id]) / response[e.id]).toFixed(2);
+                }
+            });
+
+            if (elem.value === '') {
+                target.forEach(e => e.value = '');
+                elem.value === '' && (target.forEach(e => e.value = ''));
+            }
+        } catch (error) {
+            console.error("Conversion error:", error);
+        }
+    };
+};
+
+convert(som, [usd, eur]);
+convert(usd, [som, eur]);
+convert(eur, [som, usd]);
 
 
-console.log('Loading...')
+//CARD SWITCHER
 
-
-//card switcher
-
-let count = 1
+const card = document.querySelector('.card')
 const btnPrev = document.querySelector('#btn-prev')
 const btnNext = document.querySelector('#btn-next')
-const card = document.querySelector('.card')
+let count = 0
 
-const getAsyncData = async () => {
+const requestFetch = async () => {
     try{
-        const response = await fetch(`https://jsonplaceholder.typicode.com/todos/${count}`)
+        const response = await fetch(`http://jsonplaceholder.typicode.com/todos/${count}`)
         const data = await response.json()
         card.innerHTML = `
+            <p>${data.title}</p>
+            <p>${data.completed}</p>
             <span>${data.id}</span>
-            <span>${data.title}</span>
-
-        `
-    }catch(e){
+            `
+    }catch (e) {
         console.log(e)
     }
-    
-   
 }
 btnNext.onclick = () => {
-    if(count++ && count >= 201)
-    count =1
-    getAsyncData()
+    if (count++ && count >= 201){
+        count = 1
+    }
+    requestFetch()
 }
 btnPrev.onclick = () => {
-    if(count-- && count <=1){
-        count= 200
+    if (count-- && count <= 0){
+     count = 200
     }
-    getAsyncData()
+    requestFetch()
 }
-getAsyncData()
 
-const getAsyncDataPosts = async () => {
-    try{
-        const response = await fetch('https://jsonplaceholder.typicode.com/posts/')
+const getPosts = async () => {
+    try {
+        const response = await fetch( 'https://jsonplaceholder.typicode.com/posts' )
         const data = await response.json()
-        console.log(data,'posts')
-
-    }catch(e){
-        console.log(e)
+        console.log('posts', data)
+    }catch (e) {
+        alert('ERROR')
     }
 }
-getAsyncDataPosts()
+getPosts()
 
+//WEATHER
+const cityNameInput = document.querySelector('.cityName')
+const citySpan = document.querySelector('.city')
+const tempSpan = document.querySelector('.temp')
 
+const baseUrl = 'http://api.openweathermap.org/data/2.5/weather'
+const apiKey = 'e417df62e04d3b1b111abeab19cea714'
+cityNameInput.oninput = async (event) => {
+    try {
+        const response = await fetch(`${baseUrl}?q=${event.target.value}&appid=${apiKey}`)
+        const data = await response.json()
+
+        citySpan.innerHTML = data.name ? data.name : 'Город не найден...'
+        tempSpan.innerHTML = data?.main?.temp ? Math.round(data.main.temp - 273) + '&deg;c' : '...'
+    } catch (e) {
+        alert(e,'ERROR')
+    }
+}

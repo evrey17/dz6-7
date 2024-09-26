@@ -84,3 +84,6 @@ const obj = {
 
 const jsonObj = JSON.stringify(obj)
 console.log (jsonObj)
+
+
+
